@@ -1,0 +1,69 @@
+/* Reset default margins/padding */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* Full-page layout */
+.page-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Minimal heading styling */
+.page-layout>h1 {
+    margin: 0.5rem 1rem;
+}
+
+/* Two-column container (mobile-first, stacked) */
+.two-column {
+    flex: 1;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+/* Map styling on mobile */
+#map {
+    height: 400px;
+    margin-bottom: 20px;
+}
+
+/* Hover effect for table rows */
+#dataTable tbody tr:hover {
+    cursor: pointer;
+    background-color: #f0f0f0 !important;
+}
+
+/* On larger screens (>=768px), display side by side */
+@media (min-width: 768px) {
+    .two-column {
+        display: flex;
+        flex-direction: row;
+        min-height: calc(100vh - 100px);
+    }
+
+    .table-column {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 10px;
+    }
+
+    .map-column {
+        flex: 1;
+        overflow: hidden;
+        padding: 0 10px;
+    }
+
+    #map {
+        height: 100%;
+        margin-bottom: 0;
+    }
+}
+
+#dataTable tbody tr.selected {
+    background-color: #d0ebff !important;
+}
