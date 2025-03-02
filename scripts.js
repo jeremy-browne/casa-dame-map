@@ -76,7 +76,7 @@ function preprocessRecord(record) {
             record.Email = parts.slice(1).join(" ");
         }
     }
-    
+
     // Clean up Services field if it exists
     if (record.Services) {
         // Make sure services are consistently formatted
@@ -332,48 +332,56 @@ function refreshTable() {
             refreshMap();
         });
 
-        // When a table row is clicked, toggle selection and open the marker's popup.
+        // The complete click handler function
         $('#dataTable tbody').on('click', 'tr', function () {
+            // Get the row data
             var tableRow = table.row(this);
             var rowData = tableRow.data();
             var lat = parseFloat(rowData.lat);
             var lng = parseFloat(rowData.lng);
 
-            // Check if this row is already selected
+            // If this row is already selected
             if ($(this).hasClass('selected')) {
                 // Deselect this row
                 $(this).removeClass('selected');
                 selectedRecord = null;
 
-                // Change display back to compact view
-                tableRow.cell(this, 1).data(rowData.CompactDetails).draw();
+                // Update cell content to compact view - direct DOM approach
+                $(this).children('td').eq(1).html(rowData.CompactDetails);
 
-                // Remove connection arc
+                // Remove connection arc if it exists
                 if (connectionArc) {
                     map.removeLayer(connectionArc);
                     connectionArc = null;
                 }
 
+                // Refresh the map
                 refreshMap();
-            } else {
-                // First, reset any previously selected row
+            }
+            // If this row is not selected
+            else {
+                // Deselect any previously selected rows
                 $('#dataTable tbody tr.selected').each(function () {
-                    var prevRow = table.row(this);
-                    var prevData = prevRow.data();
+                    // Get row data for the previously selected row
+                    var prevData = table.row(this).data();
 
+                    // Remove selected class
                     $(this).removeClass('selected');
-                    prevRow.cell(this, 1).data(prevData.CompactDetails);
+
+                    // Update cell content to compact view - direct DOM approach
+                    $(this).children('td').eq(1).html(prevData.CompactDetails);
                 });
 
-                // Now select this row
+                // Select this new row
                 $(this).addClass('selected');
                 selectedRecord = rowData;
 
-                // Change display to detailed view
-                tableRow.cell(this, 1).data(rowData.Details).draw();
+                // Update cell content to detailed view - direct DOM approach
+                $(this).children('td').eq(1).html(rowData.Details);
 
-                // Update map and draw connection arc
+                // Update map view and connection if coordinates are valid
                 if (!isNaN(lat) && !isNaN(lng)) {
+                    // Set map bounds if user location is known
                     if (userLat !== null && userLng !== null) {
                         var bounds = L.latLngBounds([[userLat, userLng], [lat, lng]]);
                         map.fitBounds(bounds, { padding: [50, 50] });
@@ -381,9 +389,10 @@ function refreshTable() {
                         map.setView([lat, lng], 11);
                     }
 
+                    // Draw connection arc
                     drawConnectionArc(lat, lng);
 
-                    // Open the popup for the corresponding marker
+                    // Open the popup for the marker
                     if (markerDict[rowData.Name]) {
                         markerDict[rowData.Name].openPopup();
                     } else {
@@ -442,7 +451,7 @@ function geocodeAndSort(userAddress) {
 function populateServiceFilter() {
     // Get unique services from all data
     const servicesSet = new Set();
-    
+
     allData.forEach(record => {
         if (record.Services) {
             // Split services if they're separated by semicolons
@@ -452,18 +461,18 @@ function populateServiceFilter() {
             });
         }
     });
-    
+
     // Sort services alphabetically
     const sortedServices = Array.from(servicesSet).sort();
-    
+
     // Clear existing options
     $('#serviceFilter').empty();
-    
+
     // Add options for each unique service
     sortedServices.forEach(service => {
         $('#serviceFilter').append($('<option></option>').val(service).text(service));
     });
-    
+
     // Initialize Select2 for enhanced multi-select functionality
     $('#serviceFilter').select2({
         placeholder: "Select services",
@@ -474,36 +483,36 @@ function populateServiceFilter() {
 
 function applyServiceFilter() {
     const selectedServices = $('#serviceFilter').val() || [];
-    
+
     // Clear existing custom filters
     $.fn.dataTable.ext.search.pop();
-    
+
     if (selectedServices.length > 0) {
         // Custom filtering function for DataTables
         $.fn.dataTable.ext.search.push(
-            function(settings, data, dataIndex) {
+            function (settings, data, dataIndex) {
                 const serviceCell = data[2]; // Index of Services column in the table
-                
+
                 // If no services data, don't match
                 if (!serviceCell || serviceCell === '-') {
                     return false;
                 }
-                
+
                 // Check if any of the selected services is included in this record
                 for (let i = 0; i < selectedServices.length; i++) {
                     if (serviceCell.includes(selectedServices[i])) {
                         return true;
                     }
                 }
-                
+
                 return false;
             }
         );
     }
-    
+
     // Redraw the table to apply the filter
     table.draw();
-    
+
     // After filtering the table, refresh the map to show only filtered locations
     refreshMap();
 }
@@ -518,7 +527,7 @@ $(document).ready(function () {
         });
         allData = data;
         refreshUI();
-        
+
         // Populate the service filter dropdown
         populateServiceFilter();
 
@@ -566,9 +575,9 @@ $(document).ready(function () {
         }
         geocodeAndSort(userLocation);
     });
-    
+
     // Add event listener for service filter changes
-    $('#serviceFilter').on('change', function() {
+    $('#serviceFilter').on('change', function () {
         applyServiceFilter();
     });
 });
