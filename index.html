@@ -12,6 +12,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
     <!-- jQuery UI CSS for autocomplete -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- Select2 CSS for enhanced select boxes -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Custom styles -->
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -28,13 +30,27 @@
                     <input type="text" id="locationInput" class="form-control"
                         placeholder="e.g. 123 Main St, Your City">
                 </div>
-                <button id="sortDistance" class="btn btn-primary mb-4">Sort by Distance</button>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <button id="sortDistance" class="btn btn-primary">Sort by Distance</button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="serviceFilter">Filter by Service:</label>
+                            <select id="serviceFilter" class="form-control" multiple="multiple">
+                                <!-- Service options will be populated dynamically -->
+                            </select>
+                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple services</small>
+                        </div>
+                    </div>
+                </div>
 
                 <table id="dataTable" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Address</th>
+                            <th>Services</th>
                             <th>Distance (km)</th>
                         </tr>
                     </thead>
@@ -55,6 +71,8 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script src="https://unpkg.com/leaflet.geodesic"></script>
+    <!-- Select2 JS for enhanced multi-select -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Custom JavaScript -->
     <script src="scripts.js"></script>

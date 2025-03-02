@@ -1,9 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 /* Reset default margins/padding */
 html,
 body {
     margin: 0;
     padding: 0;
     height: 100%;
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+.container-fluid {
+    padding: 1.5rem;
+}
+
+h1 {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 0.7rem;
+}
+
+/* Custom button styling */
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 0.5rem 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Form controls */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 0.6rem 0.8rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Input group styling */
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.form-text {
+    color: #7f8c8d;
+}
+
+/* Select2 customization */
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 8px;
+}
+
+.select2-container--default .select2-selection__choice__remove {
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 5px;
+}
+
+.select2-container--default .select2-selection__choice__remove:hover {
+    color: white;
+}
+
+/* DataTables customization */
+.dataTables_wrapper .dataTables_length, 
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_length select, 
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.4rem;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 3px rgba(52, 152, 219, 0.5);
+    outline: none;
+}
+
+/* Table styling */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f2f6fa;
+    border-bottom: 2px solid #e0e0e0;
+    color: #2c3e50;
+    font-weight: 500;
+    padding: 12px 15px;
+}
+
+.table tbody td {
+    padding: 10px 15px;
+    border-top: 1px solid #e8e8e8;
+    vertical-align: middle;
+}
+
+/* Hover effect for table rows */
+#dataTable tbody tr:hover {
+    cursor: pointer;
+    background-color: #edf7fd !important;
+}
+
+#dataTable tbody tr.selected {
+    background-color: #d4edff !important;
+}
+
+#dataTable tbody tr.even {
+    background-color: #f9f9f9;
+}
+
+#dataTable tbody tr.odd {
+    background-color: #ffffff;
+}
+
+/* Map customization */
+#map {
+    border-radius: 6px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    height: 400px;
+    margin-bottom: 20px;
 }
 
 /* Full-page layout */
@@ -11,11 +166,6 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-}
-
-/* Minimal heading styling */
-.page-layout>h1 {
-    margin: 0.5rem 1rem;
 }
 
 /* Two-column container (mobile-first, stacked) */
@@ -26,44 +176,59 @@ body {
     padding: 0;
 }
 
-/* Map styling on mobile */
-#map {
-    height: 400px;
-    margin-bottom: 20px;
-}
-
-/* Hover effect for table rows */
-#dataTable tbody tr:hover {
-    cursor: pointer;
-    background-color: #f0f0f0 !important;
-}
-
 /* On larger screens (>=768px), display side by side */
 @media (min-width: 768px) {
     .two-column {
         display: flex;
         flex-direction: row;
-        min-height: calc(100vh - 100px);
+        min-height: calc(100vh - 130px);
+        gap: 20px;
     }
 
     .table-column {
         flex: 1;
         overflow-y: auto;
-        padding: 0 10px;
+        padding: 0;
     }
 
     .map-column {
         flex: 1;
         overflow: hidden;
-        padding: 0 10px;
+        padding: 0;
     }
 
     #map {
-        height: 100%;
+        height: 700px; /* Fixed height instead of 100% */
         margin-bottom: 0;
     }
 }
 
-#dataTable tbody tr.selected {
-    background-color: #d0ebff !important;
+/* Pagination styling */
+.dataTables_paginate .paginate_button {
+    border-radius: 4px !important;
+    margin: 0 3px;
+}
+
+.dataTables_paginate .paginate_button.current {
+    background: #3498db !important;
+    border-color: #3498db !important;
+    color: white !important;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: #edf7fd !important;
+    border-color: #3498db !important;
+    color: #3498db !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+    }
 }

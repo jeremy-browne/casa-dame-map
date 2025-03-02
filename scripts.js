@@ -76,6 +76,15 @@ function preprocessRecord(record) {
             record.Email = parts.slice(1).join(" ");
         }
     }
+    
+    // Clean up Services field if it exists
+    if (record.Services) {
+        // Make sure services are consistently formatted
+        record.Services = record.Services.split(';')
+            .map(service => service.trim())
+            .filter(service => service.length > 0)
+            .join('; ');
+    }
 }
 
 /****************************************
@@ -118,6 +127,9 @@ function addMarkerForRecord(record) {
         if (record.Email) {
             popupContent += `<tr><td style="padding: 2px 5px;">Email:</td><td style="padding: 2px 5px;"><a href="mailto:${record.Email}">${record.Email}</a></td></tr>`;
         }
+        if (record.Services) {
+            popupContent += `<tr><td style="padding: 2px 5px;">Services:</td><td style="padding: 2px 5px;">${record.Services}</td></tr>`;
+        }
         popupContent += `</table>`;
         let marker = L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
         marker.on('click', function () {
@@ -144,7 +156,8 @@ function refreshMap() {
     // Get currently visible rows from DataTables (if available).
     let currentData = allData;
     if (table) {
-        currentData = table.rows({ page: 'current' }).data().toArray();
+        // Get all visible rows (considering filtering)
+        currentData = table.rows({ search: 'applied', page: 'current' }).data().toArray();
     }
 
     // If selectedRecord isn't in currentData, add it.
@@ -186,6 +199,9 @@ function refreshMap() {
             }
             if (record.Email) {
                 popupContent += `<tr><td style="padding: 2px 5px;">Email:</td><td style="padding: 2px 5px;"><a href="mailto:${record.Email}">${record.Email}</a></td></tr>`;
+            }
+            if (record.Services) {
+                popupContent += `<tr><td style="padding: 2px 5px;">Services:</td><td style="padding: 2px 5px;">${record.Services}</td></tr>`;
             }
             popupContent += `</table>`;
 
@@ -270,6 +286,7 @@ function buildDataTableRows() {
             Name: record.Name,
             Details: details,
             CompactDetails: compactDetails,
+            Services: record.Services || '-',
             Distance: (typeof record.distance === 'number') ? record.distance.toFixed(2) : '-',
             lat: record.lat || record.Lat,
             lng: record.lng || record.Long,
@@ -296,6 +313,7 @@ function refreshTable() {
             columns: [
                 { data: "Name", title: "Name" },
                 { data: "CompactDetails", title: "Address" }, // Start with compact view for all rows
+                { data: "Services", title: "Services" }, // Added Services column
                 { data: "Distance", title: "Distance (km)" },
                 { data: "lat", visible: false },
                 { data: "lng", visible: false },
@@ -419,6 +437,78 @@ function geocodeAndSort(userAddress) {
 }
 
 /****************************************
+ * FILTERING FUNCTIONS
+ ****************************************/
+function populateServiceFilter() {
+    // Get unique services from all data
+    const servicesSet = new Set();
+    
+    allData.forEach(record => {
+        if (record.Services) {
+            // Split services if they're separated by semicolons
+            const servicesList = record.Services.split(';').map(s => s.trim());
+            servicesList.forEach(service => {
+                if (service) servicesSet.add(service);
+            });
+        }
+    });
+    
+    // Sort services alphabetically
+    const sortedServices = Array.from(servicesSet).sort();
+    
+    // Clear existing options
+    $('#serviceFilter').empty();
+    
+    // Add options for each unique service
+    sortedServices.forEach(service => {
+        $('#serviceFilter').append($('<option></option>').val(service).text(service));
+    });
+    
+    // Initialize Select2 for enhanced multi-select functionality
+    $('#serviceFilter').select2({
+        placeholder: "Select services",
+        allowClear: true,
+        width: '100%'
+    });
+}
+
+function applyServiceFilter() {
+    const selectedServices = $('#serviceFilter').val() || [];
+    
+    // Clear existing custom filters
+    $.fn.dataTable.ext.search.pop();
+    
+    if (selectedServices.length > 0) {
+        // Custom filtering function for DataTables
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                const serviceCell = data[2]; // Index of Services column in the table
+                
+                // If no services data, don't match
+                if (!serviceCell || serviceCell === '-') {
+                    return false;
+                }
+                
+                // Check if any of the selected services is included in this record
+                for (let i = 0; i < selectedServices.length; i++) {
+                    if (serviceCell.includes(selectedServices[i])) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+        );
+    }
+    
+    // Redraw the table to apply the filter
+    table.draw();
+    
+    // After filtering the table, refresh the map to show only filtered locations
+    refreshMap();
+}
+
+/****************************************
  * PAGE INITIALIZATION
  ****************************************/
 $(document).ready(function () {
@@ -428,6 +518,9 @@ $(document).ready(function () {
         });
         allData = data;
         refreshUI();
+        
+        // Populate the service filter dropdown
+        populateServiceFilter();
 
         const saved = localStorage.getItem('userAddress');
         if (saved) {
@@ -472,5 +565,10 @@ $(document).ready(function () {
             return;
         }
         geocodeAndSort(userLocation);
+    });
+    
+    // Add event listener for service filter changes
+    $('#serviceFilter').on('change', function() {
+        applyServiceFilter();
     });
 });
